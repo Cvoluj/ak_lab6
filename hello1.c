@@ -17,16 +17,22 @@ void print_hello(int hello_world_times)
 {
 	struct hello_world_entry *entry;
 	int i;
+
+	BUG_ON(hello_world_times <= 0 || hello_world_times > 10);
 	if (hello_world_times == 0 || hello_world_times > 10) {
 		pr_err("Error, hello_world_times out of bounds 0 to 10: %d\n", hello_world_times);
 		return;
 	}
 
 	if (hello_world_times == 0 || (hello_world_times >= 5 && hello_world_times <= 10)) {
-		pr_warn("Warning, hello_world_times=%u: The number is 0 or in range(5, 10)\n");
+		pr_warn("Warning, hello_world_times=%d: The number is 0 or in range(5, 10)\n", hello_world_times);
 	}
 
 	for (i = 0; i < hello_world_times; i++) {
+		if (i == 4) {
+			pr_err("Simulated error: kmalloc() returned NULL for the 5th element\n");
+			continue;
+		}
 		entry = kmalloc(sizeof(*entry), GFP_KERNEL);
 		if (!entry) {
 			pr_err("Error, cannot allocate memory\n");
